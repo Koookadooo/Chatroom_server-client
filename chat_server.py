@@ -10,6 +10,15 @@ client_buffers = {}
 port = int(sys.argv[1])
 
 
+'''
+Handle new connection function 
+- Accepts a socket, a set of clients, a dictionary of clients, and a dictionary of client buffers
+- Receives a hello message from the client
+- Adds the client to the clients set
+- Adds the client to the client dictionary
+- Adds the client to the client buffers dictionary
+- Sends a welcome message to all clients 
+'''
 def handle_new_connection(sock, clients, client_dict, client_buffers):
     # A listening socket has detected a new connection - accept it
     client_socket, address = sock.accept()
@@ -41,6 +50,16 @@ def handle_new_connection(sock, clients, client_dict, client_buffers):
             pass
 
 
+'''
+Handle chat function
+- Accepts a socket, data, a set of clients, a dictionary of clients, and a dictionary of client buffers
+- Appends the received data to the client's buffer
+- Processes complete messages in the buffer
+- Extracts the complete message
+- Processes the complete message
+- Sends the message to all clients
+- Calls handle_commands() if the message is a command
+'''
 def handle_chat(s, data, clients, client_dict, client_buffers):
     # Append the received data to the client's buffer
     client_buffers[s] += data
@@ -70,6 +89,14 @@ def handle_chat(s, data, clients, client_dict, client_buffers):
             break
 
 
+'''
+Handle disconnect function
+- Accepts a socket, a set of clients, a dictionary of clients, and a dictionary of client buffers
+- Closes the socket
+- Removes the client from the clients set
+- Sends a message to all clients that the client has disconnected
+- Removes the client from the client dictionary and client buffers dictionary
+'''
 def handle_disconnect(s, clients, client_dict, client_buffers):
     # remove client from clients set
     s.close()
@@ -86,6 +113,13 @@ def handle_disconnect(s, clients, client_dict, client_buffers):
     del client_buffers[s]
 
 
+'''
+Handle commands function
+- Accepts a message, a socket, a set of clients, and a dictionary of clients
+- If the message is 'online', sends a list of all clients to the client
+- If the message is 'q', sends a message to all clients that the client has disconnected
+- Closes the socket and removes the client from the client dictionary and client buffers dictionary
+'''
 def handle_commands(message, s, clients, client_dict):
     # Handle special commands
     if message.startswith('online'):
